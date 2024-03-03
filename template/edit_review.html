@@ -1,0 +1,10 @@
+<!-- edit_review.html -->
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Edit Review</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Changes</button>
+  </form>
+{% endblock %}

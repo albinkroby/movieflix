@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+{% block content %}
+<div id="MovieCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#MovieCarousel" data-bs-slide-to="0" class="active"
+            aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#MovieCarousel" data-bs-slide-to="1"
+            aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#MovieCarousel" data-bs-slide-to="2"
+            aria-label="Slide 3"></button>
+    </div>
+    <div class="carousel-inner p-2 bg-secondary">
+        {% for movie in latest_movies %}
+        <div class="carousel-item row {% if forloop.first %}active{% endif %}">
+            <div class="col-3">
+                <img src="{{ movie.poster.url }}" class="d-block w-100 rounded-3" alt="{{ movie.title }}">
+            </div>
+            <div class="col-9">
+                <div class="carousel-caption d-none d-md-block">
+                    <h1>{{ movie.title }}</h1>
+                    <p>{{ movie.release_date }}</p>
+                    <p>{{ movie.description|truncate_words:20 }}</p>
+                    <a href="{{ movie.trailer_link }}" class="btn btn-danger w-50 py-2" target="_blank">Watch
+                        Trailer</a>
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#MovieCarousel"
+        data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#MovieCarousel"
+        data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+<div class="container-fluid">
+    <div class="movies mx-4">
+        <h1 class="headings mb-3">Movies</h1>
+        <div class="row row-cols-1 row-cols-md-5 g-4">
+            {% for movie in movies %}
+            <a href="{% url 'movie_detail' slug=movie.slug %}" class="movie-link ">
+                <div class="col mb-4">
+                    <div class="card rounded">
+                        <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ movie.title }}</h5>
+                            <p class="card-text">{{ movie.release_date }}</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

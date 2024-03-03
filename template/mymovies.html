@@ -1,0 +1,43 @@
+<!-- mymovies.html -->
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="m-0">
+    <div class="row justify-content-center my-3">
+        <div class="col-md-11 py-2 bg-light bg-gradient rounded">
+            <div class="d-flex mb-3 justify-content-between">
+                <h2 class="mb-4">My Movies</h2>
+                <a href="{% url 'addmovie' %}" class="btn btn-primary mb-4">Add Movie</a>
+            </div>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% if movies %}
+                {% for movie in movies %}
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{{ movie.poster.url }}" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ movie.title }}</h5>
+                        </div>
+                        <div class="">
+                            <a href="{% url 'edit_my_movie' slug=movie.slug %}" class="btn btn-secondary">Update</a>
+                            <a href="{% url 'delete_my_movie' slug=movie.slug %}" class="btn btn-danger">Delete</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p>No movies added yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% if messages %}
+<div class="alert alert-success" role="alert">
+    {% for message in messages %}
+    {{ message }}
+    {% endfor %}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+{% endblock %}

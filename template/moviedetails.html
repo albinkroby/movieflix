@@ -1,0 +1,197 @@
+<!-- movie_detail.html -->
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row mt-3">
+        <div class="col-md-3">
+            <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="img-fluid">
+        </div>
+        <div class="col-md-8">
+            <h2>{{ movie.title }}</h2>
+            <p>Total Rating: {{ total_rating|default:0 }}/10<i class="rating bi bi-star-fill"></i></p>
+            <p>{{ movie.description }}</p>
+            <p>Release Date: {{ movie.release_date }}</p>
+            <p>Actors: {{ movie.actors }}</p>
+            <p>Category: {{ movie.category.name }}</p>
+            <div class="row">
+                <a href="{{ movie.trailer_link }}" class="col-9 btn btn-danger w-50 py-2 me-2" target="_blank">Watch
+                    Trailer</a>
+                {% if userreviews %}
+                {% for review in userreviews %}
+                {% if review.user == user %}
+                <button type="button" class="btn btn-outline-primary col-3" data-bs-toggle="modal"
+                    data-bs-target="#updatemovierate">{{review.rating}}/10&nbsp;<i
+                        class="rating bi bi-star-fill"></i></button>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <button type="button" class="btn btn-primary col-3" data-bs-toggle="modal"
+                    data-bs-target="#movierate"><i class="rating bi bi-star-fill"></i>&nbsp;Rate</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="movie-review row mt-5">
+        <div class="col-12 mb-4">
+            <h3>Reviews</h3>
+            {% if reviews %}
+            <ul>
+                {% for review in reviews %}
+                <div class="card w-75">
+                    <div class="card-body row">
+                        <div class="col-6">
+                            <h5 class="card-title"><i class="bi bi-person-circle text-danger"></i>&nbsp;
+                                {{review.user.username }}</h5>
+                            <p class="card-text">{{ review.text }}</p>
+                            <div class="card-text">
+                                {{review.rating}}<i class="rating bi bi-star-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No reviews yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<!-- update modal -->
+{% if userreviews %}
+<div class="modal fade" id="updatemovierate" tabindex="-1" aria-labelledby="updatemovierate" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="updatemovierate">Add Review</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% for review in userreviews %}
+                <form method="post" action="{% url 'edit_review' slug=movie.slug %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="message-text" class="col-form-label">Your Review:</label>
+                        <textarea class="form-control" id="message-text" name="updatereview_text" rows="4"
+                            required>{{ review.text }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message-text" class="col-form-label">Rate:</label>
+                        <div class="update constellation">
+                            <!-- Change the number of stars based on your preference -->
+                            <i class="bi bi-star-fill" data-rating="1"></i>
+                            <i class="bi bi-star-fill" data-rating="2"></i>
+                            <i class="bi bi-star-fill" data-rating="3"></i>
+                            <i class="bi bi-star-fill" data-rating="4"></i>
+                            <i class="bi bi-star-fill" data-rating="5"></i>
+                            <i class="bi bi-star-fill" data-rating="6"></i>
+                            <i class="bi bi-star-fill" data-rating="7"></i>
+                            <i class="bi bi-star-fill" data-rating="8"></i>
+                            <i class="bi bi-star-fill" data-rating="9"></i>
+                            <i class="bi bi-star-fill" data-rating="10"></i>
+                        </div>
+                    </div>
+                    <input class="form-control" type="number" id="ratinginput" name="updaterating" min="1" max="10"
+                        value="{{review.rating}}" required hidden><br>
+                    
+                    <button class="btn btn-primary w-100 mb-2" type="submit">Update Review</button>
+                    <a href="{% url 'delete_review' slug=movie.slug review_id=review.id %}" class="btn btn-danger w-100">Remove Rating</a>
+                    
+                </form>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const stars = document.querySelectorAll('.constellation i');
+        var ratingval = $('#ratinginput').val();
+        for (let i = 0; i < ratingval; i++) {
+            stars[i].classList.add('active');
+        }
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const rating = star.getAttribute('data-rating');
+                stars.forEach(s => s.classList.remove('active'));
+
+                for (let i = 0; i < rating; i++) {
+                    stars[i].classList.add('active');
+                }
+
+                var ratingstar = $('.constellation i.active').length;
+                $('#ratinginput').val(ratingstar);
+                console.log(ratingstar);
+            });
+        });
+
+    });
+</script>
+{% else %}
+<!-- rating modal -->
+<div class="modal fade" id="movierate" tabindex="-1" aria-labelledby="movierate" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="movierate">Add Review</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'add_review' slug=movie.slug %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="message-text" class="col-form-label">Your Review:</label>
+                        <textarea class="form-control" id="message-text" name="review_text" rows="4"
+                            required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message-text" class="col-form-label">Rate:</label>
+                        <div class="constellation">
+                            <!-- Change the number of stars based on your preference -->
+                            <i class="bi bi-star-fill" data-rating="1"></i>
+                            <i class="bi bi-star-fill" data-rating="2"></i>
+                            <i class="bi bi-star-fill" data-rating="3"></i>
+                            <i class="bi bi-star-fill" data-rating="4"></i>
+                            <i class="bi bi-star-fill" data-rating="5"></i>
+                            <i class="bi bi-star-fill" data-rating="6"></i>
+                            <i class="bi bi-star-fill" data-rating="7"></i>
+                            <i class="bi bi-star-fill" data-rating="8"></i>
+                            <i class="bi bi-star-fill" data-rating="9"></i>
+                            <i class="bi bi-star-fill" data-rating="10"></i>
+                        </div>
+                    </div>
+                    <input class="form-control" type="number" id="ratinginput" name="rating" min="1" max="10" required
+                        hidden><br>
+                    <div class="mb-3 d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" type="submit">Submit Review</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const stars = document.querySelectorAll('.constellation i');
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const rating = star.getAttribute('data-rating');
+                stars.forEach(s => s.classList.remove('active'));
+
+                for (let i = 0; i < rating; i++) {
+                    stars[i].classList.add('active');
+                }
+
+                var ratingstar = $('.constellation i.active').length;
+                $('#ratinginput').val(ratingstar);
+                console.log(ratingstar);
+            });
+        });
+
+    });
+</script>
+{% endif %}
+
+{% endblock %}

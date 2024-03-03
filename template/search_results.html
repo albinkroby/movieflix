@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="movies mx-4">
+            <p class="headings mb-3">You searched for : {{query}}</p>
+            <div class="row row-cols-1 row-cols-md-5 g-4">
+                {% for movie in movies %}
+                    <a href="{% url 'movie_detail' slug=movie.slug %}" class="movie-link "><div class="col mb-4">
+                        <div class="card rounded">
+                            <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ movie.title }}</h5>
+                                <p class="card-text">{{ movie.release_date }}</p>
+                            </div>
+                        </div>
+                    </div></a>
+                    {% empty %}
+                    <div class="row no-found">
+                        <i class="bi bi-robot"></i>
+                        <p class="text-center my_search_text">0 results found</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    
+    {% endblock %}

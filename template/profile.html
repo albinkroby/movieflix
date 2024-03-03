@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container m-0">
+    <div class="row">
+        {% if messages %}
+        <div class="alert alert-dismissible {% if messages.tags %} alert-{{ messages.tags }}{% endif %}">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {% for message in messages %}
+            {{ message }}
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="col-md-3 pt-4 bg-light bg-gradient">
+            <div class="row">
+                <div class="col-12">
+                    <a class="nav-link text-black" href="{% url 'profile' %}"><strong class="fs-4">Profile</strong></a>
+                </div>
+                <hr>
+                <!-- <div class="col-12">
+                    <a class="nav-link text-black" href="{% url 'profile' %}"><strong class="fs-4">Change password</strong></a>
+                </div><hr> -->
+            </div>
+        </div>
+        <div class="col-md-9 py-5 px-5">
+            <h2 class="mb-4">Profile</h2>
+            <form method="post">
+                {% csrf_token %}
+
+                {% for field in form %}
+                <div class="form-group mt-2">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{field}}
+                </div>
+                {% endfor %}
+                <div class="justify-content-between mt-2 d-none update-btn">
+                    <button type="submit" class="btn btn-primary col-5">Update</button>
+                    <button type="button" class="btn btn-secondary btn-cancel col-5">Cancel</button>
+                </div>
+            </form>
+            <a class="btn btn-primary mt-3 w-100 edit-btn" href="#">Edit Profile</a>
+        </div>
+        <script>
+            $(".form-control").prop("disabled", true);
+            $('.edit-btn').click(function(){
+                $('.update-btn').removeClass('d-none');
+                $('.update-btn').addClass('row');
+                $(this).addClass('d-none')
+                $(".form-control").prop("disabled", false);
+            })
+            $('.btn-cancel').click(function(){
+                $('.edit-btn').removeClass('d-none');
+                $(".form-control").prop("disabled", true);
+                $('.update-btn').addClass('d-none');
+            })
+        </script>
+    </div>
+</div>
+
+{% endblock %}
